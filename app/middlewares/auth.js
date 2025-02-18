@@ -5,11 +5,18 @@ const verifyToken = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-    console.log(decoded);
+    req.userId = decoded.userId;
     next();
   } catch (error) {
-    res.status(403);
+    console.log(error.message);
+    res.sendStatus(403);
   }
 };
 
-export default verifyToken;
+const verifyUser = (req, res, next) => {
+  if (req.userId != req.params.id) {
+    return res.sendStatus(403);
+  }
+  next();
+};
+export { verifyToken, verifyUser };
