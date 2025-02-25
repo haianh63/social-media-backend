@@ -29,6 +29,15 @@ const findUserByUsername = async (username) => {
   return result;
 };
 
+const findUserByName = async (keyword) => {
+  const result = await sql`
+  SELECT user_id, avatar_src, name 
+  FROM Users
+  WHERE name ILIKE ${keyword + "%"}
+  `;
+
+  return result;
+};
 const findUserByUserId = async (userId) => {
   const result = await sql`
     SELECT user_id, name, avatar_src, cover_src 
@@ -59,4 +68,10 @@ const updateUserProfile = async (user) => {
 
   return result;
 };
-export { createUser, findUserByUsername, findUserByUserId, updateUserProfile };
+export {
+  createUser,
+  findUserByUsername,
+  findUserByUserId,
+  updateUserProfile,
+  findUserByName,
+};

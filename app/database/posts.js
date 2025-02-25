@@ -29,4 +29,41 @@ const deletePostByPostId = async (postId) => {
   return result;
 };
 
-export { createPost, getPostByUserId, deletePostByPostId };
+const createPostReaction = async ({ userId, postId, reactionId }) => {
+  await sql`
+    INSERT INTO user_post_reactions (user_id, post_id, reaction_id)
+    VALUES (${userId}, ${postId}, ${reactionId})
+    ON CONFLICT (user_id, post_id)
+    DO UPDATE SET reaction_id = EXCLUDED.reaction_id;
+  `;
+};
+
+const getPostReaction = async (postId) => {
+  const result = sql`
+  SELECT user_post_reactions.user_id, reaction_id, name, avatar_src
+  FROM user_post_reactions
+  INNER JOIN users ON user_post_reactions.user_id = users.user_id
+  WHERE post_id = ${postId}
+  `;
+
+  return result;
+};
+
+const getAllPost = async () => {
+  const result = await sql`
+  SELECT post_id, users.user_id, content, img_src, avatar_src, Posts.created_at
+  FROM Posts
+  INNER JOIN users ON Posts.user_id = users.user_id
+  ORDER BY Posts.created_at DESC
+  `;
+
+  return result;
+};
+export {
+  createPost,
+  getPostByUserId,
+  deletePostByPostId,
+  createPostReaction,
+  getPostReaction,
+  getAllPost,
+};

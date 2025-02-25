@@ -1,9 +1,28 @@
 import { Router } from "express";
-import { findUserByUserId, updateUserProfile } from "../database/users.js";
+import {
+  findUserByName,
+  findUserByUserId,
+  updateUserProfile,
+} from "../database/users.js";
 import { verifyToken, verifyUser } from "../middlewares/auth.js";
 import upload from "../middlewares/fileUpload.js";
 const router = Router();
 const uploadPath = "uploads";
+
+router.get("/search", async (req, res) => {
+  try {
+    const keyword = req.query.name;
+    const result = await findUserByName(keyword);
+    res.status(200).json({
+      success: true,
+      data: result,
+    });
+  } catch (error) {
+    console.log(error);
+    res.sendStatus(500);
+  }
+});
+
 router.get("/:id", async (req, res) => {
   const userId = req.params.id;
   try {

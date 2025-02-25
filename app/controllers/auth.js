@@ -40,7 +40,9 @@ const signIn = async (req, res) => {
     const token = jwt.sign(
       {
         userId: user[0].user_id,
-        name: username,
+        username: username,
+        avatar_src: user[0].avatar_src,
+        name: user[0].name,
       },
       process.env.ACCESS_TOKEN_SECRET,
       { expiresIn: "1h" }
@@ -48,7 +50,12 @@ const signIn = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      data: { token, userId: user[0].user_id },
+      data: {
+        token,
+        userId: user[0].user_id,
+        avatar_src: user[0].avatar_src,
+        name: user[0].name,
+      },
     });
   } catch (error) {
     res.status(400).json({
