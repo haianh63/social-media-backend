@@ -64,7 +64,8 @@ const updateUserProfile = async (user) => {
   const result = await sql`
   UPDATE users
   SET ${sql(user, columns)}
-  WHERE user_id = ${user.user_id}`;
+  WHERE user_id = ${user.user_id}
+  returning name, avatar_src`;
 
   return result;
 };

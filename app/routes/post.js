@@ -2,118 +2,30 @@ import express from "express";
 import upload from "../middlewares/fileUpload.js";
 import { verifyToken, verifyUser } from "../middlewares/auth.js";
 import {
-  createPost,
-  createPostReaction,
-  deletePostByPostId,
-  getAllPost,
-  getPostByUserId,
-  getPostReaction,
-} from "../database/posts.js";
-import deleteFile from "../utils/deleteFile.js";
+  createUserPost,
+  deletePost,
+  getPosts,
+  getReaction,
+  getUserPosts,
+  reactPost,
+} from "../controllers/post.js";
 
 const router = express.Router();
-const uploadPath = "uploads";
 
-router.get("/", async (req, res) => {
-  try {
-    const result = await getAllPost();
+router.get("/", getPosts);
 
-    res.status(200).json({
-      success: true,
-      data: result,
-    });
-  } catch (error) {
-    res.sendStatus(500);
-  }
-});
-
-router.get("/:id", async (req, res) => {
-  try {
-    const result = await getPostByUserId(req.params.id);
-
-    return res.status(200).json({
-      success: true,
-      data: result,
-    });
-  } catch (error) {
-    console.log(error.message);
-    return res.status(400);
-  }
-});
+router.get("/:id", getUserPosts);
 router.post(
   "/:id/create",
   verifyToken,
   verifyUser,
   upload.single("image"),
-  async (req, res) => {
-    if (!req.body.content && !req.file) {
-      return res.sendStatus(400);
-    }
-
-    const content = req.body.content || null;
-    const file = req.file;
-    const filePath = file ? `${uploadPath}/${req.file.filename}` : null;
-
-    try {
-      const result = await createPost({
-        userId: req.params.id,
-        content,
-        image: filePath,
-      });
-      console.log(result);
-      return res.sendStatus(200);
-    } catch (error) {
-      console.log(error.message);
-      return res.sendStatus(400);
-    }
-  }
+  createUserPost
 );
 
-router.post("/react", verifyToken, async (req, res) => {
-  try {
-    const userId = req.userId;
-    const postId = req.body.postId;
-    const reactionId = req.body.reactionId;
+router.post("/react", verifyToken, reactPost);
 
-    await createPostReaction({ userId, postId, reactionId });
-    return res.sendStatus(200);
-  } catch (error) {
-    console.log(error.message);
-    return res.sendStatus(500);
-  }
-});
+router.get("/react/:postId", getReaction);
 
-router.get("/react/:postId", async (req, res) => {
-  try {
-    const postId = req.params.postId;
-    const result = await getPostReaction(postId);
-
-    res.status(200).json({
-      success: true,
-      data: result,
-    });
-  } catch (error) {
-    console.log(error.message);
-    return res.sendStatus(500);
-  }
-});
-
-router.delete(
-  "/:id/delete/:postId",
-  verifyToken,
-  verifyUser,
-  async (req, res) => {
-    try {
-      const postId = req.params.postId;
-      const result = await deletePostByPostId(postId);
-      if (result.length > 0) {
-        deleteFile(`public/${result[0].img_src}`);
-      }
-      return res.sendStatus(200);
-    } catch (error) {
-      console.log(error.message);
-      return res.sendStatus(400);
-    }
-  }
-);
+router.delete("/:id/delete/:postId", verifyToken, verifyUser, deletePost);
 export default router;
