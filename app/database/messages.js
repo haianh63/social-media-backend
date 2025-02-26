@@ -23,10 +23,9 @@ const getMessages = async ({ sender_id, receiver_id }) => {
 
 const getUserSendMessage = async ({ userId }) => {
   const result = await sql`
-  SELECT DISTINCT receiver_id, name, avatar_src
-  FROM messages
-  INNER JOIN users ON messages.receiver_id = users.user_id
-  WHERE messages.sender_id = ${userId};
+  SELECT DISTINCT user_id, name, avatar_src
+  FROM users
+  WHERE user_id != ${userId}
   `;
 
   return result;
