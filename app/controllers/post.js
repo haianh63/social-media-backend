@@ -6,8 +6,6 @@ import {
   getPostByUserId,
   getPostReaction,
 } from "../database/posts.js";
-import deleteFile from "../utils/deleteFile.js";
-const uploadPath = "uploads";
 
 const getPosts = async (req, res) => {
   try {
@@ -41,9 +39,9 @@ const createUserPost = async (req, res) => {
     return res.sendStatus(400);
   }
 
-  const content = req.body.content || null;
+  const content = req.body.content || "";
   const file = req.file;
-  const filePath = file ? `${uploadPath}/${req.file.filename}` : null;
+  const filePath = file ? file.path : null;
 
   try {
     const result = await createPost({
@@ -91,10 +89,7 @@ const getReaction = async (req, res) => {
 const deletePost = async (req, res) => {
   try {
     const postId = req.params.postId;
-    const result = await deletePostByPostId(postId);
-    if (result.length > 0) {
-      deleteFile(`public/${result[0].img_src}`);
-    }
+    await deletePostByPostId(postId);
     return res.sendStatus(200);
   } catch (error) {
     console.log(error.message);

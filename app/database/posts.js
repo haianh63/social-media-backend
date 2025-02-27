@@ -11,10 +11,11 @@ const createPost = async ({ userId, content, image }) => {
 
 const getPostByUserId = async (userId) => {
   const result = await sql`
-    SELECT *
+    SELECT post_id, img_src, content, Posts.created_at, name
     FROM Posts
-    WHERE user_id = ${userId}
-    ORDER BY created_at DESC
+    INNER JOIN users ON Posts.user_id = users.user_id
+    WHERE Posts.user_id = ${userId}
+    ORDER BY Posts.created_at DESC
     `;
   return result;
 };
@@ -51,7 +52,7 @@ const getPostReaction = async (postId) => {
 
 const getAllPost = async () => {
   const result = await sql`
-  SELECT post_id, users.user_id, content, img_src, avatar_src, Posts.created_at
+  SELECT post_id, users.user_id, users.name, content, img_src, avatar_src, Posts.created_at
   FROM Posts
   INNER JOIN users ON Posts.user_id = users.user_id
   ORDER BY Posts.created_at DESC

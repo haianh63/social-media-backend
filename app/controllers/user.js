@@ -48,13 +48,9 @@ const editProfile = async (req, res) => {
   if (avatarFile) avatarFile = avatarFile[0];
   let coverFile = req.files["cover"];
   if (coverFile) coverFile = coverFile[0];
-  const avatarFilePath = avatarFile
-    ? `${uploadPath}/${avatarFile.filename}`
-    : null;
+  const avatarFilePath = avatarFile ? avatarFile.path : null;
 
-  const coverFilePath = coverFile
-    ? `${uploadPath}/${coverFile.filename}`
-    : null;
+  const coverFilePath = coverFile ? coverFile.path : null;
 
   try {
     const result = await updateUserProfile({
